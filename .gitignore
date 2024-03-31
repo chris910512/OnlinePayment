@@ -132,3 +132,5 @@ GitHub.sublime-settings
 .idea/modules.xml
 .idea/misc.xml
 .idea/dataSources.xml
+.idea/jsLibraryMappings.xml
+.idea/inspectionProfiles/Project_Default.xml

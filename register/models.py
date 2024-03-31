@@ -16,7 +16,7 @@ class UserProfile(models.Model):
     last_name = models.CharField(max_length=100)
     email = models.EmailField()
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
-    balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    balance = models.DecimalField(max_digits=10, decimal_places=2, default=1000)
 
     def __str__(self):
         return self.user.username
