@@ -6,6 +6,16 @@
 {% endblock %}
 
 {% block content %}
+    <style>
+        #baseCurrency {
+            color: #7F7F7F;
+        }
+
+        #calculatedAmount {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card">
@@ -14,10 +24,24 @@
                     <form method="post" action="{% url 'signup' %}">>
                         {% csrf_token %}
                         {{ form|crispy }}
+                        <p id="baseCurrency">Your base currency is GBP 1000.00 and it will be calculated if you choose other currency automatically.</p>
+                        <p id="baseCurrency">Calculated amount: <span id="calculatedAmount">1000.00</span> <span id="calculatedCurrencyCode">GBP</span></p>
                         <button type="submit" class="btn btn-primary">Register</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        var conversionRates = {{ conversion_rates|safe }};
+        var baseAmount = 1000;
+
+        document.getElementById('id_currency').addEventListener('change', function() {
+            var selectedCurrency = this.value;
+            var conversionRate = conversionRates[selectedCurrency];
+            var calculatedAmount = baseAmount * conversionRate;
+            document.getElementById('calculatedAmount').textContent = calculatedAmount.toFixed(2);
+            document.getElementById('calculatedCurrencyCode').textContent = selectedCurrency;
+        });
+    </script>
 {% endblock %}

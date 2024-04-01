@@ -1,7 +1,10 @@
+import json
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 
+from .currencies import Currency
 from .forms import OnlinePaymentUserCreationForm
 from .models import UserProfile
 
@@ -45,4 +48,5 @@ def signup_view(request):
             return redirect('/register/user-list')
     else:
         form = OnlinePaymentUserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+        conversion_rates = Currency.get_conversion_rates()
+        return render(request, 'signup.html', {'form': form, 'conversion_rates': json.dumps(conversion_rates)})

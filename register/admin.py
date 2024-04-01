@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from register.models import UserProfile, Currency, Admin
+from register.models import UserProfile, Admin
 
 # Register your models here.
 
-admin.site.register(Currency)
 admin.site.register(UserProfile)
 admin.site.register(Admin)

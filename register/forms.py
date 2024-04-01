@@ -1,12 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import UserProfile, Currency
+
+from .currencies import Currency
+from .models import UserProfile
 
 
 class OnlinePaymentUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
-    currency = forms.ModelChoiceField(queryset=Currency.objects.all())
+    currency = forms.ChoiceField(choices=[(currency['code'], currency['code']) for currency in Currency.get_all_currencies()])
     first_name = forms.CharField(max_length=30)
     last_name = forms.CharField(max_length=30)
 
@@ -21,11 +23,11 @@ class OnlinePaymentUserCreationForm(UserCreationForm):
         user.last_name = self.cleaned_data['last_name']
         if commit:
             user.save()
-            currency = self.cleaned_data['currency']
-            initial_balance = calculate_initial_balance()
+            currency_code = self.cleaned_data['currency']
+            initial_balance = calculate_initial_balance(currency_code)
             UserProfile.objects.create(
                 user=user,
-                currency=currency,
+                currency=currency_code,
                 balance=initial_balance,
                 first_name=self.cleaned_data['first_name'],
                 last_name=self.cleaned_data['last_name'],
@@ -34,6 +36,7 @@ class OnlinePaymentUserCreationForm(UserCreationForm):
         return user
 
 
-def calculate_initial_balance():
-    initial_balance = 1000
-    return initial_balance
+def calculate_initial_balance(currency_code):
+    initial_balance_in_gbp = 1000
+    conversion_rate = next((currency['conversion_rate_to_gbp'] for currency in Currency.get_all_currencies() if currency['code'] == currency_code), 1)
+    return initial_balance_in_gbp * conversion_rate
