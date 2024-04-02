@@ -1,7 +1,7 @@
 class Currency:
     GBP = {'code': 'GBP', 'name': 'British Pound', 'conversion_rate_to_gbp': 1}
-    USD = {'code': 'USD', 'name': 'US Dollar', 'conversion_rate_to_gbp': 1.39}  # Update this with the current rate
-    EUR = {'code': 'EUR', 'name': 'Euro', 'conversion_rate_to_gbp': 1.17}  # Update this with the current rate
+    USD = {'code': 'USD', 'name': 'US Dollar', 'conversion_rate_to_gbp': 1.39}
+    EUR = {'code': 'EUR', 'name': 'Euro', 'conversion_rate_to_gbp': 1.17}
 
     @staticmethod
     def get_all_currencies():

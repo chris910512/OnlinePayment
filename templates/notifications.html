@@ -1,0 +1,14 @@
+{% extends './base.html' %}
+
+{% block content %}
+    <h2>Your Notifications</h2>
+    <ul>
+        {% for notification in notifications %}
+            <li>
+                You received a payment of {{ notification.amount }} from {{ notification.sender.username }} on {{ notification.timestamp }}
+            </li>
+        {% empty %}
+            <li>No notifications yet.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -12,8 +12,12 @@ home_url = '/register/user-list'
 
 
 def user_list(request):
-    users = UserProfile.objects.all()
-    return render(request, 'user_list.html', {'users': users})
+    user_profiles = UserProfile.objects.all().values('user__username', 'first_name', 'last_name', 'currency')
+    if request.user.is_authenticated:
+        current_user_profile = UserProfile.objects.get(user=request.user)
+    else:
+        current_user_profile = None
+    return render(request, 'user_list.html', {'users': user_profiles, 'current_user_profile': current_user_profile})
 
 
 def logout_view(request):

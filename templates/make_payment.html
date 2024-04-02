@@ -1,0 +1,38 @@
+{% extends './base.html' %}
+
+{% block content %}
+    <style>
+        body {
+            background-color: #b3b9bc;
+            color: #333;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="submit"] {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+    <form method="post">
+        {% csrf_token %}
+        <label for="recipient">Recipient:</label>
+        <input type="text" id="recipient" name="recipient">
+        <label for="amount">Amount:</label>
+        <input type="text" id="amount" name="amount">
+        <input type="submit" value="Submit">
+    </form>
+{% endblock %}
