@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from .currencies import Currency
+from .currencies import Currency, CurrencyRate
 from .models import UserProfile
 
 
@@ -37,6 +37,11 @@ class OnlinePaymentUserCreationForm(UserCreationForm):
 
 
 def calculate_initial_balance(currency_code):
-    initial_balance_in_gbp = 1000
-    conversion_rate = next((currency['conversion_rate_to_gbp'] for currency in Currency.get_all_currencies() if currency['code'] == currency_code), 1)
-    return initial_balance_in_gbp * conversion_rate
+    base_amount_gbp = 1000
+    if currency_code == 'GBP':
+        return base_amount_gbp
+    else:
+        currency_rate = CurrencyRate()
+        conversion_rate = currency_rate.get_rate('GBP', currency_code)
+        return base_amount_gbp * conversion_rate
+

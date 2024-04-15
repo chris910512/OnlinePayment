@@ -4,9 +4,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 
+from register.currencies import CurrencyRate
 from .models import Notification, Transaction, PaymentRequest
 
 
@@ -99,3 +101,13 @@ def decline_payment_request(request, request_id):
         messages.error(request, 'Payment request could not be declined.')
 
     return redirect(reverse('notifications'))
+
+
+def convert_currency(request, currency1, currency2, amount_of_currency1):
+    currency_rate = CurrencyRate()
+    try:
+        rate = currency_rate.get_rate(currency1, currency2)
+        converted_amount = rate * amount_of_currency1
+        return JsonResponse({'converted_amount': converted_amount})
+    except KeyError:
+        return HttpResponseBadRequest('One or both of the provided currencies are not supported.')
