@@ -12,7 +12,7 @@ class PaymentRequest(models.Model):
     is_completed = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.sender} -> {self.receiver}: {self.amount} Request"
+        return f"{self.sender} -> {self.recipient}: {self.amount} Request"
 
 
 class Notification(models.Model):
@@ -20,3 +20,7 @@ class Notification(models.Model):
     recipient = models.ForeignKey(User, related_name='received_notifications', on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.sender.userprofile.first_name} {self.sender.userprofile.last_name} ' \
+               f'sent {self.amount} to {self.recipient.userprofile.first_name} {self.recipient.userprofile.last_name}'
