@@ -1,14 +1,98 @@
 {% extends './base.html' %}
 
 {% block content %}
+
+    <style>
+        h4 {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            width: 25%;
+            text-align: center;
+        }
+        tr:nth-child(1) {
+            background-color: #e0e0e0;
+        }
+    </style>
+
     <h2>Your Notifications</h2>
-    <ul>
-        {% for notification in notifications %}
-            <li>
-                You received a payment of {{ notification.amount }} from {{ notification.sender.username }} on {{ notification.timestamp }}
-            </li>
+
+    <h4>Received Payments</h4>
+    <table>
+        <tr>
+            <th>Sender</th>
+            <th>Amount</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for payment in received_payments %}
+            <tr>
+                <td>{{ payment.sender.user.username }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.timestamp }}</td>
+            </tr>
         {% empty %}
-            <li>No notifications yet.</li>
+            <tr>
+                <td colspan="3">No received payments yet.</td>
+            </tr>
         {% endfor %}
-    </ul>
+    </table>
+
+    <h4>Sent Payments</h4>
+    <table>
+        <tr>
+            <th>Recipient</th>
+            <th>Amount</th>
+            <th>Timestamp</th>
+        </tr>
+        {% for payment in sent_payments %}
+            <tr>
+                <td>{{ payment.recipient.user.username }}</td>
+                <td>{{ payment.amount }}</td>
+                <td>{{ payment.timestamp }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3">No sent payments yet.</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h4>Payment Requests</h4>
+    <table>
+        <tr>
+            <th>Requester</th>
+            <th>Amount</th>
+            <th>Timestamp</th>
+            <th>Action</th>
+        </tr>
+        {% for request in payment_requests %}
+            <tr>
+                <td>{{ request.sender.user.username }}</td>
+                <td>{{ request.amount }}</td>
+                <td>{{ request.timestamp }}</td>
+                <td>
+                    {% if request.is_accepted == None %}
+                        <form method="post" style="display: flex; justify-content: center;">
+                        {% csrf_token %}
+                            <input type="submit" value="Accept" onclick="this.form.action='{% url 'accept_payment_request' request.id %}';">
+                            <input type="submit" value="Decline" onclick="this.form.action='{% url 'decline_payment_request' request.id %}';">
+                        </form>
+                    {% elif request.is_accepted %}
+                        Accepted
+                    {% else %}
+                        Declined
+                    {% endif %}
+                </td>
+        {% empty %}
+            <tr>
+                <td colspan="4">No payment requests yet.</td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

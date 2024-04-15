@@ -41,13 +41,6 @@
         .table-container {
             position: relative;
         }
-        .toast {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
-        }
     </style>
 
     {% if request.user.is_authenticated %}
@@ -71,11 +64,12 @@
                             <td>{{ user.last_name }}</td>
                             <td>{{ user.currency }}</td>
                             <td>
-                                <form action="{% url 'make_payment' %}" method="post">
+                                <form action="" method="post" class="payment-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="recipient" value="{{ user.user__username }}">
                                     <input type="text" name="amount" placeholder="Amount" class="amount-input">
-                                    <input type="submit" value="Pay" class="pay-button">
+                                    <input type="submit" value="Pay" class="pay-button" onclick="this.form.action='{% url 'make_payment' %}';">
+                                    <input type="submit" value="Request" class="request-button" onclick="this.form.action='{% url 'request_payment' %}';">
                                 </form>
                             </td>
                         </tr>
@@ -87,27 +81,18 @@
         <p style="font-size: 2em; color: red; font-weight: bold;">Please login first.</p>
     {% endif %}
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
-                <div class="toast-header">
-                    <strong class="me-auto">{{ message.tags }}</strong>
-                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-                <div class="toast-body">
-                    {{ message }}
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-
     <script>
         window.onload = function() {
             var inputs = document.querySelectorAll("input[name='amount']");
-            var buttons = document.querySelectorAll(".pay-button");
+            var payButton = document.querySelectorAll(".pay-button");
+            var requestButton = document.querySelectorAll(".request-button");
 
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].style.display = "none";
+            for (var i = 0; i < payButton.length; i++) {
+                payButton[i].style.display = "none";
+            }
+
+            for (var i = 0; i < requestButton.length; i++) {
+                requestButton[i].style.display = "none";
             }
 
             for (var i = 0; i < inputs.length; i++) {
@@ -115,14 +100,17 @@
                     if (this.value !== "") {
                         for (var j = 0; j < inputs.length; j++) {
                             if (inputs[j] !== this) {
-                                buttons[j].style.display = "none";
+                                payButton[j].style.display = "none";
+                                requestButton[j].style.display = "none";
                             } else {
-                                buttons[j].style.display = "inline";
+                                payButton[j].style.display = "inline";
+                                requestButton[j].style.display = "inline";
                             }
                         }
                     } else {
                         for (var j = 0; j < inputs.length; j++) {
-                            buttons[j].style.display = "none";
+                            payButton[j].style.display = "none";
+                            requestButton[j].style.display = "none";
                         }
                     }
                 });
