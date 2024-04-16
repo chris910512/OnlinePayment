@@ -17,7 +17,10 @@ def user_list(request):
         current_user_profile = UserProfile.objects.get(user=request.user)
     else:
         current_user_profile = None
-    return render(request, 'user_list.html', {'users': user_profiles, 'current_user_profile': current_user_profile})
+    return render(request, 'user_list.html',{
+        'users': user_profiles,
+        'current_user_profile': current_user_profile
+    })
 
 
 def logout_view(request):

@@ -21,9 +21,9 @@ def make_payment(request):
     recipient = User.objects.get(username=recipient_username)
 
     if sender.userprofile.balance >= amount:
-        make_transaction(amount, recipient, sender)
+        recipient_currency, converted_amount = make_transaction(amount, recipient, sender)
 
-        messages.success(request, 'Payment was successful.')
+        messages.success(request, f'Payment was successful. \n{converted_amount} {recipient_currency} was sent to {recipient.username}.')
         return redirect(reverse('user_list'))
     else:
         messages.error(request, 'Payment failed. Not enough balance.')
@@ -31,12 +31,23 @@ def make_payment(request):
 
 
 def make_transaction(amount, recipient, sender):
+    currency_rate = CurrencyRate()
+    sender_currency = sender.userprofile.currency
+    recipient_currency = recipient.userprofile.currency
+
+    rate = Decimal(currency_rate.get_rate(sender_currency, recipient_currency))
+    converted_amount = round(rate * amount, 2)
+
+    # Transactions
     sender.userprofile.balance -= amount
-    recipient.userprofile.balance += amount
+    recipient.userprofile.balance += converted_amount
     sender.userprofile.save()
     recipient.userprofile.save()
-    Notification.objects.create(sender=sender, recipient=recipient, amount=amount)
-    Transaction.objects.create(sender=sender.userprofile, recipient=recipient.userprofile, amount=amount)
+
+    Notification.objects.create(sender=sender, recipient=recipient, amount=converted_amount)
+    Transaction.objects.create(sender=sender.userprofile, recipient=recipient.userprofile, amount=converted_amount)
+
+    return recipient_currency, converted_amount
 
 
 def request_payment(request):
@@ -46,24 +57,25 @@ def request_payment(request):
         recipient = User.objects.get(username=recipient_username)
         amount = Decimal(request.POST.get('amount'))
 
-        PaymentRequest.objects.create(sender=sender.userprofile, recipient=recipient.userprofile, amount=amount)
+        # Sender and Recipient are swapped in the PaymentRequest model
+        PaymentRequest.objects.create(sender=recipient.userprofile, recipient=sender.userprofile, amount=amount)
 
         messages.success(request, 'Payment request was successful.')
         return redirect(reverse('user_list'))
-    else:
-        return render(request, 'request_payment.html')
 
 
 @login_required
 def notifications(request):
     received_payments = Transaction.objects.filter(recipient=request.user.userprofile)
     sent_payments = Transaction.objects.filter(sender=request.user.userprofile)
-    payment_requests = PaymentRequest.objects.filter(recipient=request.user.userprofile)
+    payment_requests = PaymentRequest.objects.filter(sender=request.user.userprofile)
+    user_currency = request.user.userprofile.currency
 
     return render(request, 'notifications.html', {
         'received_payments': received_payments,
         'sent_payments': sent_payments,
-        'payment_requests': payment_requests
+        'payment_requests': payment_requests,
+        'user_currency': user_currency
     })
 
 
@@ -76,12 +88,12 @@ def accept_payment_request(request, request_id):
     amount = payment_request.amount
 
     if sender.userprofile.balance >= amount:
-        make_transaction(amount, recipient, sender)
+        recipient_currency, converted_amount = make_transaction(amount, recipient, sender)
 
         payment_request.is_accepted = True
         payment_request.save()
 
-        messages.success(request, 'Payment request accepted.')
+        messages.success(request, f'Payment was successful. \n{converted_amount} {recipient_currency} was sent to {recipient.username}.')
     else:
         messages.error(request, 'Payment request could not be accepted.')
 

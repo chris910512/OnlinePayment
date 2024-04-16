@@ -27,12 +27,12 @@
     <table>
         <tr>
             <th>Sender</th>
-            <th>Amount</th>
+            <th>Amount ({{ user_currency }})</th>
             <th>Timestamp</th>
         </tr>
         {% for payment in received_payments %}
             <tr>
-                <td>{{ payment.sender.user.username }}</td>
+                <td>{{ payment.sender.user.first_name }} {{ payment.sender.user.last_name }}</td>
                 <td>{{ payment.amount }}</td>
                 <td>{{ payment.timestamp }}</td>
             </tr>
@@ -47,12 +47,12 @@
     <table>
         <tr>
             <th>Recipient</th>
-            <th>Amount</th>
+            <th>Amount ({{ user_currency }})</th>
             <th>Timestamp</th>
         </tr>
         {% for payment in sent_payments %}
             <tr>
-                <td>{{ payment.recipient.user.username }}</td>
+                <td>{{ payment.recipient.user.first_name }} {{ payment.recipient.user.last_name }}</td>
                 <td>{{ payment.amount }}</td>
                 <td>{{ payment.timestamp }}</td>
             </tr>
@@ -67,13 +67,13 @@
     <table>
         <tr>
             <th>Requester</th>
-            <th>Amount</th>
+            <th>Amount ({{ user_currency }})</th>
             <th>Timestamp</th>
             <th>Action</th>
         </tr>
         {% for request in payment_requests %}
             <tr>
-                <td>{{ request.sender.user.username }}</td>
+                <td>{{ request.recipient.user.first_name }} {{ request.recipient.user.last_name }}</td>
                 <td>{{ request.amount }}</td>
                 <td>{{ request.timestamp }}</td>
                 <td>

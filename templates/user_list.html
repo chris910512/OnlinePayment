@@ -50,6 +50,7 @@
             <p>Your Balance: {{ current_user_profile.balance }}</p>
         </div>
         <div class="table-container">
+            <p style="text-align: right; color: red; font-weight: bold; margin: 0;">Enter the amount in your own currency. This will be converted to the recipient's currency at the end of the transaction.</p>
             <table>
                 <tr>
                     <th>First Name</th>
@@ -67,9 +68,9 @@
                                 <form action="" method="post" class="payment-form">
                                     {% csrf_token %}
                                     <input type="hidden" name="recipient" value="{{ user.user__username }}">
-                                    <input type="text" name="amount" placeholder="Amount" class="amount-input">
-                                    <input type="submit" value="Pay" class="pay-button" onclick="this.form.action='{% url 'make_payment' %}';">
-                                    <input type="submit" value="Request" class="request-button" onclick="this.form.action='{% url 'request_payment' %}';">
+                                    <input type="text" name="amount" placeholder="Money" class="amount-input">
+                                    <input type="submit" value="Pay ({{ current_user_profile.currency }})" class="pay-button" onclick="this.form.action='{% url 'make_payment' %}';">
+                                    <input type="submit" value="Request ({{ current_user_profile.currency }})" class="request-button" onclick="this.form.action='{% url 'request_payment' %}';">
                                 </form>
                             </td>
                         </tr>
