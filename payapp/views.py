@@ -4,9 +4,11 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import HttpResponseNotAllowed
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from register.currencies import CurrencyRate
 from .models import Notification, Transaction, PaymentRequest
@@ -23,7 +25,8 @@ def make_payment(request):
     if sender.userprofile.balance >= amount:
         recipient_currency, converted_amount = make_transaction(amount, recipient, sender)
 
-        messages.success(request, f'Payment was successful. \n{converted_amount} {recipient_currency} was sent to {recipient.username}.')
+        messages.success(request,
+                         f'Payment was successful. \n{converted_amount} {recipient_currency} was sent to {recipient.username}.')
         return redirect(reverse('user_list'))
     else:
         messages.error(request, 'Payment failed. Not enough balance.')
@@ -93,7 +96,8 @@ def accept_payment_request(request, request_id):
         payment_request.is_accepted = True
         payment_request.save()
 
-        messages.success(request, f'Payment was successful. \n{converted_amount} {recipient_currency} was sent to {recipient.username}.')
+        messages.success(request,
+                         f'Payment was successful. \n{converted_amount} {recipient_currency} was sent to {recipient.username}.')
     else:
         messages.error(request, 'Payment request could not be accepted.')
 
@@ -115,7 +119,11 @@ def decline_payment_request(request, request_id):
     return redirect(reverse('notifications'))
 
 
+@csrf_exempt
 def convert_currency(request, currency1, currency2, amount_of_currency1):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(request.method)
+
     currency_rate = CurrencyRate()
     try:
         rate = currency_rate.get_rate(currency1, currency2)
