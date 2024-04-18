@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+from timestamp_service.utils import get_timestamp
 from .currencies import Currency, CurrencyRate
 from .models import UserProfile
 
@@ -31,7 +32,8 @@ class OnlinePaymentUserCreationForm(UserCreationForm):
                 balance=initial_balance,
                 first_name=self.cleaned_data['first_name'],
                 last_name=self.cleaned_data['last_name'],
-                email=self.cleaned_data['email']
+                email=self.cleaned_data['email'],
+                timestamp=get_timestamp()
             )
         return user
 

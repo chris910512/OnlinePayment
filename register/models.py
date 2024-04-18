@@ -9,6 +9,7 @@ class UserProfile(models.Model):
     email = models.EmailField()
     currency = models.CharField(max_length=3)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=1000)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.user.username

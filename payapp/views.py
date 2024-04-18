@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from register.currencies import CurrencyRate
+from timestamp_service.utils import get_timestamp
 from .models import Notification, Transaction, PaymentRequest
 
 
@@ -46,9 +47,10 @@ def make_transaction(amount, recipient, sender):
     recipient.userprofile.balance += converted_amount
     sender.userprofile.save()
     recipient.userprofile.save()
+    timestamp = get_timestamp()
 
-    Notification.objects.create(sender=sender, recipient=recipient, amount=converted_amount)
-    Transaction.objects.create(sender=sender.userprofile, recipient=recipient.userprofile, amount=converted_amount)
+    Notification.objects.create(sender=sender, recipient=recipient, amount=converted_amount, timestamp=timestamp)
+    Transaction.objects.create(sender=sender.userprofile, recipient=recipient.userprofile, amount=converted_amount, timestamp=timestamp)
 
     return recipient_currency, converted_amount
 
@@ -59,9 +61,10 @@ def request_payment(request):
         recipient_username = request.POST.get('recipient')
         recipient = User.objects.get(username=recipient_username)
         amount = Decimal(request.POST.get('amount'))
+        timestamp = get_timestamp()
 
         # Sender and Recipient are swapped in the PaymentRequest model
-        PaymentRequest.objects.create(sender=recipient.userprofile, recipient=sender.userprofile, amount=amount)
+        PaymentRequest.objects.create(sender=recipient.userprofile, recipient=sender.userprofile, amount=amount, timestamp=timestamp)
 
         messages.success(request, 'Payment request was successful.')
         return redirect(reverse('user_list'))
@@ -128,6 +131,11 @@ def convert_currency(request, currency1, currency2, amount_of_currency1):
     try:
         rate = currency_rate.get_rate(currency1, currency2)
         converted_amount = rate * amount_of_currency1
-        return JsonResponse({'converted_amount': converted_amount})
+        timestamp = get_timestamp()
+
+        return JsonResponse({
+            'converted_amount': converted_amount,
+            'timestamp': timestamp
+        })
     except KeyError:
         return HttpResponseBadRequest('One or both of the provided currencies are not supported.')

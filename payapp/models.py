@@ -12,7 +12,7 @@ class PaymentRequest(models.Model):
     is_accepted = models.BooleanField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.sender} -> {self.recipient}: {self.amount} Request"
+        return f"{self.sender} -> {self.recipient}: {self.amount} {self.recipient.currency} Request"
 
 
 class Notification(models.Model):

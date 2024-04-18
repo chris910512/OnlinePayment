@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     "webapps2024",
     "register.apps.RegisterConfig",
-    "payapp.apps.PayappConfig"
+    "payapp.apps.PayappConfig",
+    "timestamp_service.apps.TimestampServiceConfig"
 ]
 
 MIDDLEWARE = [
