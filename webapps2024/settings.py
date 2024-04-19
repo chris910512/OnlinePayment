@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "webapps2024",
     "register.apps.RegisterConfig",
     "payapp.apps.PayappConfig",
+    "sslserver",
     "timestamp_service.apps.TimestampServiceConfig"
 ]
 
