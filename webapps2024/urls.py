@@ -19,9 +19,12 @@ from django.urls import include
 from django.urls import path
 from django.views.generic.base import RedirectView
 
+from webapps2024 import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
     path('payapp/', include('payapp.urls')),
-    path('', RedirectView.as_view(url='/register/user-list', permanent=True))
+    path('', RedirectView.as_view(url='/register/user-list', permanent=True)),
+    path('.well-known/pki-validation/<str:filename>', views.serve_file)
 ]
