@@ -1,7 +1,9 @@
 import json
 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
 from .currencies import CurrencyRate
@@ -11,13 +13,18 @@ from .models import UserProfile
 home_url = '/register/user-list'
 
 
+def not_admin(user: User):
+    return not user.is_superuser
+
+
+@user_passes_test(not_admin, login_url='/register/login')
 def user_list(request):
     user_profiles = UserProfile.objects.all().values('user__username', 'first_name', 'last_name', 'currency')
     if request.user.is_authenticated:
         current_user_profile = UserProfile.objects.get(user=request.user)
     else:
         current_user_profile = None
-    return render(request, 'user_list.html',{
+    return render(request, 'user_list.html', {
         'users': user_profiles,
         'current_user_profile': current_user_profile
     })
