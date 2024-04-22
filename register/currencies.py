@@ -24,4 +24,6 @@ class CurrencyRate:
         return currency_rates
 
     def get_rate(self, base_currency_code, target_currency_code):
+        if base_currency_code == target_currency_code:
+            return 1
         return self.currency_rates[f"{base_currency_code}/{target_currency_code}"]
