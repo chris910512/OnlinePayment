@@ -1,5 +1,6 @@
 import json
 
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
@@ -36,6 +37,7 @@ def logout_view(request):
 
 
 def login_view(request):
+    form = AuthenticationForm()
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -44,9 +46,7 @@ def login_view(request):
             login(request, user)
             return redirect('/register/user-list')
         else:
-            pass
-    else:
-        form = AuthenticationForm()
+            messages.error(request, 'Invalid username or password.')
     return render(request, 'login.html', {'login_user': form})
 
 
@@ -58,8 +58,15 @@ def signup_view(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('/register/user-list')
+            if user is not None:
+                login(request, user)
+                return redirect('/register/user-list')
+            else:
+                messages.error(request, 'Signup failed. Please try again.')
+                return render(request, 'signup.html', {'form': form})
+        else:
+            messages.error(request, 'Invalid form data.')
+            return render(request, 'signup.html', {'form': form})
     else:
         form = OnlinePaymentUserCreationForm()
         currency_rate = CurrencyRate()
