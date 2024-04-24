@@ -111,13 +111,10 @@ def accept_payment_request(request, request_id):
 def decline_payment_request(request, request_id):
     payment_request = get_object_or_404(PaymentRequest, id=request_id)
 
-    if payment_request.recipient.user == request.user:
-        payment_request.is_accepted = False
-        payment_request.save()
+    payment_request.is_accepted = False
+    payment_request.save()
 
-        messages.success(request, 'Payment request declined.')
-    else:
-        messages.error(request, 'Payment request could not be declined.')
+    messages.success(request, 'Payment request declined.')
 
     return redirect(reverse('notifications'))
 
