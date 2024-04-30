@@ -25,6 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', include('register.urls')),
     path('payapp/', include('payapp.urls')),
+    path('api/', include('api.urls')),
     path('', RedirectView.as_view(url='/register/user-list', permanent=True)),
     path('.well-known/pki-validation/<str:filename>', views.serve_file)
 ]

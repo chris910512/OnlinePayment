@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "register.apps.RegisterConfig",
     "payapp.apps.PayappConfig",
     "sslserver",
+    "rest_framework",
     "timestamp_service.apps.TimestampServiceConfig"
 ]
 
